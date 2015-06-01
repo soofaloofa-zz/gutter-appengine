@@ -1,0 +1,131 @@
+{# Renders field for bootstrap 3 standards.
+
+    Params:
+        field - WTForm field
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_field(form.email, placeholder='Input email', type='email') }}
+#}
+{% macro render_field(field, label_visible=true) -%}
+
+    <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+        {% if (field.type != 'HiddenField' and field.type !='CSRFTokenField') and label_visible %}
+            <label for="{{ field.id }}" class="control-label">{{ field.label }}</label>
+        {% endif %}
+        {{ field(class_='form-control', **kwargs) }}
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{# Renders checkbox fields since they are represented differently in bootstrap
+    Params:
+        field - WTForm field (there are no check, but you should put here only BooleanField.
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_checkbox_field(form.remember_me) }}
+ #}
+{% macro render_checkbox_field(field) -%}
+    <div class="checkbox">
+        <label>
+            {{ field(type='checkbox', **kwargs) }} {{ field.label }}
+        </label>
+    </div>
+{%- endmacro %}
+
+{# Renders radio field
+    Params:
+        field - WTForm field (there are no check, but you should put here only BooleanField.
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_radio_field(form.answers) }}
+ #}
+{% macro render_radio_field(field) -%}
+    {% for value, label, _ in field.iter_choices() %}
+        <div class="radio">
+            <label>
+                <input type="radio" name="{{ field.id }}" id="{{ field.id }}" value="{{ value }}">{{ label }}
+            </label>
+        </div>
+    {% endfor %}
+{%- endmacro %}
+
+
+{# Render a single condition #}
+{% macro render_condition(condition) -%}
+{% if condition.name %}
+<li id="{{ condition.name }}">
+{% else %}
+<li id="conditions-0">
+{% endif %}
+  <div class="row">
+    <div class="col-xs-2">
+      {{ render_field(condition.argument, label_visible=False) }}
+    </div>
+    <div class="col-xs-2">
+      {{ render_field(condition.negative, label_visible=False) }}
+    </div>
+    <div class="col-xs-3">
+      {{ render_field(condition.operator, label_visible=False) }}
+    </div>
+    <div class="col-xs-2">
+      {{ render_field(condition.operator_arguments[0], label_visible=False) }}
+    </div>
+    <div class="col-xs-2">
+      {{ render_field(condition.operator_arguments[1], label_visible=False) }}
+    </div>
+    <div class="col-xs-1">
+      <button type="button" data-action="remove-condition" class="btn btn-link">Remove</button>
+    </div>
+  </div>
+</li>
+{%- endmacro %}
+
+{# Render an entire switch #}
+{% macro render_switch(switch, deletable=True, collapse=True, new=False) -%}
+  <h3>
+    {% if collapse %}
+    <button class="btn btn-info" data-toggle="collapse" href="#{{ switch.name.data|replace(':', '-') }}" aria-expanded="false">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    </button>
+    {% endif %}
+    {{ switch.name.data }}
+  </h3>
+  <form id="{{ switch.name.data|replace(':', '-') }}" {% if collapse %}class="collapse"{% endif %} method="POST" action="/gutter/" role="form">
+    {{ render_field(switch.name, readonly=not new, placeholder='A unique switch name.') }}
+    {{ render_field(switch.label, placeholder='A label -- useful for grouping switches.') }}
+    {{ render_field(switch.description, placeholder='A text description of this switch.') }}
+    {{ render_field(switch.state, placeholder='A text description of this switch.') }}
+    {{ render_checkbox_field(switch.compounded) }}
+    {{ render_checkbox_field(switch.concent) }}
+    {{ switch.delete }}
+    {% if new %}
+      {{ render_field(switch.is_new, value='new') }}
+    {% endif %}
+    <div class="control-group" id="condition-group">
+      <label>Conditions</label>
+      <ul class="list-unstyled conditions">
+      {% for condition in switch.conditions %}
+        <li>
+        {{ render_condition(condition) }}
+        </li>
+      {% endfor %}
+      </ul>
+      <button type="button" data-action="add-condition" class="btn btn-link">Add Condition</button>
+    </div>
+    <button type="submit" class="btn btn-default">Save Switch</button>
+    {% if deletable %}
+      <button data-action="delete" class="btn btn-danger">Delete Switch</button>
+    {% endif %}
+  </form>
+  <hr>
+{%- endmacro %}

@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+
+<table>
+  <thead>
+    <tr>
+      <th>Switch Name</th>
+      <th>Is Active?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for switch in switches %}
+    <tr><td>{{ switch[0] }}</td><td>{{ switch[1] }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</body>

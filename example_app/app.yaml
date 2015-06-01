@@ -1,0 +1,23 @@
+application: gutter-appengine-test-app
+version: gutter-appengine-test
+runtime: python27
+threadsafe: true
+api_version: 1
+
+builtins:
+- appstats: on
+
+includes:
+- lib/gutter/appengine/
+
+libraries:
+- name: webob
+  version: "1.1.1"
+- name: webapp2
+  version: "2.5.1"
+- name: jinja2
+  version: "2.6"
+
+handlers:
+- url: /
+  script: main.APP

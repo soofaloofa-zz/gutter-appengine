@@ -1,0 +1,8 @@
+handlers:
+- url: /gutter/static/
+  static_dir: lib/gutter/appengine/static/
+
+- url: /gutter.*
+  script: gutter.appengine.main.APP
+  login: admin
+
