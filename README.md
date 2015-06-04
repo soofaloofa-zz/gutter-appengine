@@ -1,7 +1,5 @@
 # Gutter for AppEngine
 
-[![Build Status](https://travis-ci.org/soofaloofa/gutter-appengine.svg)](https://travis-ci.org/soofaloofa/gutter-appengine)
-
 gutter-appengine provides an App Engine front-end for [gutter][gutter]. It
 allows you to create and update switches using a UI and to register new
 arguments and operators particular to your application.
